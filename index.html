@@ -1,53 +1,251 @@
-// CONFIGURAÇÕES DE RECEBIMENTO
-const MINHA_CHAVE_PIX = "523.852.778-08"; // Sua chave aqui
-const MEU_WHATSAPP = "(18) 99629-6170"; // Seu número (com DDD e 55)
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ilha Bela Store | Oficial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .card-item { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; transition: all 0.3s; }
+        .card-item:hover { border-color: #eab308; transform: translateY(-4px); box-shadow: 0 10px 20px -10px rgba(234, 179, 8, 0.3); }
+        .pixel-border { border: 2px solid #eab308; box-shadow: 4px 4px 0px #854d0e; }
+    </style>
+</head>
+<body>
 
-function copiarPix() {
-    const chave = document.getElementById('chave-pix').innerText;
-    navigator.clipboard.writeText(chave);
-    alert("Chave PIX copiada!");
-}
+    <nav class="bg-black border-b border-yellow-600/50 sticky top-0 z-40 backdrop-blur-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-black text-yellow-500 tracking-tighter cursor-pointer" onclick="window.location.reload()">ILHA BELA STORE</h1>
+            <div class="flex items-center gap-4">
+                <button onclick="showSection('loja')" class="hover:text-yellow-500 font-bold text-sm">LOJA</button>
+                <button onclick="toggleCart()" class="bg-yellow-600 text-black px-4 py-1.5 rounded-lg text-sm font-black flex items-center gap-2">
+                    🛒 <span id="cart-count">0</span>
+                </button>
+                <button id="btn-adm" onclick="solicitarLogin()" class="text-[10px] border border-gray-700 text-gray-500 px-2 py-1 rounded uppercase hover:border-yellow-500 hover:text-yellow-500 transition">Adm</button>
+            </div>
+        </div>
+    </nav>
 
-// ATUALIZE sua função finalizarCompra para abrir o pagamento:
-async function finalizarCompra() {
-    if (carrinho.length === 0) return alert("Carrinho vazio!");
-    
-    const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
-    const itensNomes = carrinho.map(i => i.nome).join(', ');
+    <section id="secao-loja" class="container mx-auto px-4 py-12">
+        <div class="text-center mb-16">
+            <h2 class="text-5xl font-black mb-4 tracking-tight">VIP & <span class="text-yellow-500">SERVICES</span></h2>
+            <p class="text-gray-400">Artes profissionais e vantagens exclusivas para a Ilha Bela.</p>
+        </div>
 
-    // 1. Salva no Firebase (para você ter o registro no ADM)
-    try {
-        await addDoc(collection(db, "vendas"), {
-            itens: itensNomes,
-            total: total,
-            data: new Date().toLocaleString(),
-            status: "Aguardando Pagamento"
-        });
+        <div id="lista-produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            </div>
+    </section>
 
-        // 2. Abre o Modal de Pagamento
-        document.getElementById('modal-carrinho').style.display = 'none';
-        document.getElementById('modal-pagamento').style.display = 'flex';
-        
-    } catch (e) {
-        alert("Erro ao processar pedido.");
-    }
-}
+    <section id="secao-admin" class="container mx-auto px-4 py-12 hidden">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+            <h2 class="text-3xl font-bold text-yellow-500">Painel do Sr. Leal</h2>
+            <button onclick="window.location.reload()" class="bg-red-900/30 text-red-500 px-4 py-2 rounded-lg border border-red-500/20 text-sm">Sair do Painel</button>
+        </div>
 
-function enviarWhatsApp() {
-    const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
-    const itensNomes = carrinho.map(i => i.nome).join(', ');
-    
-    const mensagem = `Olá! Acabei de fazer um pedido na Ilha Bela Store:
-📦 *Itens:* ${itensNomes}
-💰 *Total:* R$ ${total.toFixed(2)}
-✅ *Estou enviando o comprovante em anexo.*`;
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800">
+                <h3 class="text-xl font-bold mb-6 italic">Cadastrar Novo Item</h3>
+                <div class="space-y-4">
+                    <input type="text" id="adm-nome" placeholder="Nome do Produto" class="w-full p-3 rounded-xl bg-black border border-slate-700 outline-none focus:border-yellow-500 transition">
+                    <input type="number" id="adm-preco" placeholder="Preço (R$)" class="w-full p-3 rounded-xl bg-black border border-slate-700 outline-none focus:border-yellow-500 transition">
+                    <button onclick="adicionarProduto()" class="w-full bg-yellow-600 text-black font-black py-4 rounded-xl hover:bg-yellow-500 transition">ADICIONAR À VITRINE</button>
+                </div>
+            </div>
 
-    const url = `https://wa.me/${MEU_WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
-    
-    // Limpa o carrinho após enviar
-    carrinho = [];
-    document.getElementById('cart-count').innerText = 0;
-    document.getElementById('modal-pagamento').style.display = 'none';
-    
-    window.open(url, '_blank');
-}
+            <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800">
+                <h3 class="text-xl font-bold mb-6 italic">Vendas Recentes (Navegador)</h3>
+                <div id="lista-vendas" class="space-y-3 max-h-80 overflow-y-auto">
+                    <p class="text-gray-500 text-center py-10">Nenhuma venda detectada neste dispositivo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="modal-carrinho" class="modal flex items-center justify-center p-4">
+        <div class="bg-slate-950 border border-yellow-600/50 w-full max-w-md rounded-3xl p-8 shadow-2xl">
+            <h2 class="text-2xl font-black text-yellow-500 mb-6">Meu Pedido</h2>
+            <div id="itens-carrinho" class="space-y-4 mb-8"></div>
+            <div class="border-t border-slate-800 pt-6 flex justify-between items-center mb-8">
+                <span class="text-lg text-gray-400 font-bold">Total a pagar:</span>
+                <span class="text-3xl font-black text-white">R$ <span id="total-carrinho">0.00</span></span>
+            </div>
+            <div class="flex flex-col gap-3">
+                <button onclick="finalizarCompra()" class="w-full bg-yellow-600 text-black font-black py-4 rounded-2xl hover:bg-yellow-500 transition text-lg">PROSSEGUIR PARA O PIX</button>
+                <button onclick="toggleCart()" class="w-full py-2 text-gray-500 font-bold text-sm">Continuar Comprando</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-pagamento" class="modal flex items-center justify-center p-4">
+        <div class="bg-slate-950 border border-green-500/50 w-full max-w-md rounded-3xl p-10 text-center">
+            <div class="mb-6">
+                <div class="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-green-500 text-4xl">💰</div>
+                <h2 class="text-2xl font-black">Pagar via PIX</h2>
+                <p class="text-gray-400 text-sm">Escaneie o QR Code ou copie a chave abaixo</p>
+            </div>
+            
+            <div class="bg-white p-3 w-52 h-52 mx-auto mb-8 rounded-2xl">
+                <img id="qrcode-pix" src="" alt="QR Code PIX">
+            </div>
+
+            <div class="bg-black p-4 rounded-2xl mb-8 flex items-center justify-between border border-slate-800">
+                <code id="chave-pix" class="text-green-400 font-mono text-sm">52385277808</code>
+                <button onclick="copiarPix()" class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded-lg font-bold">COPIAR</button>
+            </div>
+
+            <button onclick="enviarWhats()" class="w-full bg-green-600 py-4 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-green-500 transition shadow-lg shadow-green-900/20">
+                ENVIAR COMPROVANTE (WhatsApp)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÕES DO SR. LEAL
+        const EMAIL_ADM_ALVO = "srleal018@gmail.com";
+        const MEU_WHATSAPP = "5518996296170"; // Seu número configurado
+        const CHAVE_PIX_CPF = "52385277808"; // Sua chave PIX
+
+        // PRODUTOS INICIAIS
+        let produtosPadrao = [
+            { id: 1, nome: "Banner Personalizado", preco: 50.00 },
+            { id: 2, nome: "Logo Exclusiva", preco: 80.00 },
+            { id: 3, nome: "Servidor Discord (Full)", preco: 150.00 },
+            { id: 4, nome: "Site Vendas (Script)", preco: 350.00 },
+            { id: 5, nome: "Dinheiro Ilha Bela (100k)", preco: 20.00 },
+            { id: 6, nome: "Armas Ilha Bela (Kit)", preco: 180.00 },
+            { id: 7, nome: "Munição Ilha Bela (Pack)", preco: 30.00 }
+        ];
+
+        let produtos = JSON.parse(localStorage.getItem('ilhabella_prods')) || produtosPadrao;
+        let vendas = JSON.parse(localStorage.getItem('ilhabella_sales')) || [];
+        let carrinho = [];
+
+        function salvar() {
+            localStorage.setItem('ilhabella_prods', JSON.stringify(produtos));
+            localStorage.setItem('ilhabella_sales', JSON.stringify(vendas));
+        }
+
+        // LOJA
+        function renderProdutos() {
+            const container = document.getElementById('lista-produtos');
+            container.innerHTML = produtos.map(p => `
+                <div class="card-item p-6 rounded-2xl">
+                    <div class="h-40 bg-slate-800/50 rounded-xl mb-6 flex items-center justify-center border border-slate-700">
+                        <span class="text-slate-600 font-black italic">ILHA BELA ART</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">${p.nome}</h3>
+                    <div class="flex justify-between items-center">
+                        <span class="text-yellow-500 font-black text-2xl font-mono">R$ ${p.preco.toFixed(2)}</span>
+                        <button onclick="addToCart(${p.id})" class="bg-white text-black px-4 py-2 rounded-xl font-black text-xs hover:bg-yellow-500 transition">ADICIONAR</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const p = produtos.find(item => item.id == id);
+            carrinho.push(p);
+            document.getElementById('cart-count').innerText = carrinho.length;
+            // Efeito visual simples
+            const btn = event.target;
+            btn.innerText = "OK!";
+            setTimeout(() => btn.innerText = "ADICIONAR", 800);
+        }
+
+        function toggleCart() {
+            const m = document.getElementById('modal-carrinho');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+            if(m.style.display === 'flex') {
+                const container = document.getElementById('itens-carrinho');
+                let total = 0;
+                container.innerHTML = carrinho.map(i => {
+                    total += i.preco;
+                    return `<div class="flex justify-between items-center bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
+                        <span class="font-bold text-sm">${i.nome}</span>
+                        <span class="text-yellow-500 font-bold text-sm">R$ ${i.preco.toFixed(2)}</span>
+                    </div>`;
+                }).join('') || '<p class="text-center text-gray-500 py-4 font-bold">Seu carrinho está vazio!</p>';
+                document.getElementById('total-carrinho').innerText = total.toFixed(2);
+            }
+        }
+
+        function finalizarCompra() {
+            if(carrinho.length === 0) return;
+            const total = carrinho.reduce((a, b) => a + b.preco, 0);
+            
+            // Gerar QR Code via API pública (baseado no valor e chave)
+            const qrData = `PIX|CHAVE:${CHAVE_PIX_CPF}|VALOR:${total.toFixed(2)}|LOJA:ILHABELASTORE`;
+            document.getElementById('qrcode-pix').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+            
+            // Salvar no historico local
+            vendas.push({ data: new Date().toLocaleString(), total, itens: carrinho.map(c => c.nome).join(', ') });
+            salvar();
+
+            document.getElementById('modal-carrinho').style.display = 'none';
+            document.getElementById('modal-pagamento').style.display = 'flex';
+        }
+
+        function copiarPix() {
+            navigator.clipboard.writeText(CHAVE_PIX_CPF);
+            alert("Chave PIX copiada!");
+        }
+
+        function enviarWhats() {
+            const total = carrinho.reduce((a, b) => a + b.preco, 0);
+            const itens = carrinho.map(c => c.nome).join(', ');
+            const msg = encodeURIComponent(`*NOVO PEDIDO - ILHA BELA STORE*\n\n📦 *ITENS:* ${itens}\n💰 *TOTAL:* R$ ${total.toFixed(2)}\n\n_Acabei de fazer o PIX, segue o comprovante:_`);
+            window.open(`https://wa.me/${MEU_WHATSAPP}?text=${msg}`, '_blank');
+            carrinho = [];
+            window.location.reload();
+        }
+
+        // ADMIN
+        function solicitarLogin() {
+            const email = prompt("Digite seu e-mail de administrador:");
+            if(email === EMAIL_ADM_ALVO) {
+                document.getElementById('secao-loja').classList.add('hidden');
+                document.getElementById('secao-admin').classList.remove('hidden');
+                renderVendas();
+            } else {
+                alert("Acesso exclusivo para srleal018@gmail.com");
+            }
+        }
+
+        function adicionarProduto() {
+            const nome = document.getElementById('adm-nome').value;
+            const preco = parseFloat(document.getElementById('adm-preco').value);
+            if(nome && preco) {
+                produtos.push({ id: Date.now(), nome, preco });
+                salvar();
+                renderProdutos();
+                alert("Produto adicionado à vitrine!");
+                document.getElementById('adm-nome').value = '';
+                document.getElementById('adm-preco').value = '';
+            }
+        }
+
+        function renderVendas() {
+            const container = document.getElementById('lista-vendas');
+            container.innerHTML = vendas.map(v => `
+                <div class="bg-black p-4 rounded-xl border-l-4 border-yellow-600">
+                    <div class="flex justify-between font-black text-sm text-yellow-500 mb-1">
+                        <span>R$ ${v.total.toFixed(2)}</span>
+                        <span class="text-gray-600 text-[10px]">${v.data}</span>
+                    </div>
+                    <p class="text-[11px] text-gray-400 font-medium">Produtos: ${v.itens}</p>
+                </div>
+            `).reverse().join('') || '<p class="text-gray-500 text-center py-10">Sem vendas.</p>';
+        }
+
+        function showSection(sec) {
+            document.getElementById('secao-loja').classList.remove('hidden');
+            document.getElementById('secao-admin').classList.add('hidden');
+        }
+
+        // START
+        renderProdutos();
+    </script>
+</body>
+</html>
