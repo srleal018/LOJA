@@ -3,213 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ilha Bela Hub | Vendas & Suporte</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Sistema Grêmio Estudantil - SED</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        .chat-window { height: 400px; overflow-y: auto; scroll-behavior: smooth; }
+        :root {
+            --sed-primary: #00a896;
+            --sed-secondary: #0077b6;
+            --sed-dark: #1d2d35;
+            --sed-bg: #f0f4f7;
+        }
+       
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--sed-bg); margin: 0; padding: 20px; }
+       
+        .container {
+            background: #ffffff; padding: 30px; border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 95%;
+            max-width: 800px; margin: auto; border-top: 6px solid var(--sed-primary);
+        }
+
+        .header-logos {
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee;
+        }
+        .header-logos img { max-height: 120px; max-width: 200px; object-fit: contain; }
+       
+        h2 { text-align: center; color: var(--sed-dark); font-weight: 600; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
+        button { width: 100%; padding: 14px; background-color: var(--sed-secondary); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; }
+        button:hover { background-color: #005f91; }
+        .btn-save { background-color: var(--sed-primary); }
+        .btn-log { background: #6c757d; margin-top: 20px; }
         .hidden { display: none; }
-        body { background: #020617; color: white; }
-        .admin-sidebar { border-right: 1px solid #1e293b; }
+        .table-container { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .badge-download { background-color: var(--sed-primary); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; border: none; }
     </style>
 </head>
 <body>
 
-    <nav class="bg-black border-b border-yellow-600 p-4 flex justify-between items-center sticky top-0 z-50">
-        <h1 class="text-xl font-black text-yellow-500 tracking-tighter">ILHA BELA HUB</h1>
-        <div class="flex gap-4">
-            <button onclick="showSection('loja')" class="text-sm font-bold">LOJA</button>
-            <button id="btn-adm-login" onclick="solicitarAcessoAdm()" class="text-sm text-gray-500 bg-gray-900 px-3 py-1 rounded">PAINEL ADM</button>
+    <div id="login-screen" class="container">
+        <div class="header-logos">
+            <img src="https://media-gru2-1.cdn.whatsapp.net/v/t61.24694-24/489405406_650586094569182_6793834854762065392_n.jpg?ccb=11-4&oh=01_Q5Aa3QFLI5uLR7B-Jj5LSyAQd7wxXJoZ9ceCDkzThVR0E9T4Bw&oe=69645917&_nc_sid=5e03e0&_nc_cat=102" alt="Logo Grêmio GC">
         </div>
-    </nav>
-
-    <section id="secao-loja" class="container mx-auto p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="grid-produtos">
-            </div>
-    </section>
-
-    <div id="chat-container" class="fixed bottom-4 right-4 w-80 bg-slate-900 border border-yellow-600 rounded-t-2xl shadow-2xl hidden">
-        <div class="bg-yellow-600 p-3 text-black font-bold flex justify-between rounded-t-xl">
-            <span>Suporte Online</span>
-            <button onclick="fecharChat()">X</button>
+        <h2>Acesso ao Portal Grêmio Estudantil</h2>
+        <div class="form-group">
+            <label>Selecione seu Cargo</label>
+            <select id="user">
+                <option value="" disabled selected>Escolha uma opção...</option>
+                <option value="COORDENADOR FINANCEIRO">COORDENADOR FINANCEIRO</option>
+                <option value="COORDENADOR EVENTOS">COORDENADOR EVENTOS</option>
+                <option value="COORDENADOR COMUNICAÇÃO">COORDENADOR COMUNICAÇÃO</option>
+                <option value="COORDENADOR DESPORTIVO">COORDENADOR DESPORTIVO</option>
+                <option value="COORDENADOR CULTURAL">COORDENADOR CULTURAL</option>
+                <option value="COORDENADOR RELAÇÕES SOCIAIS/CONVIVA">COORDENADOR RELAÇÕES SOCIAIS/CONVIVA</option>
+                <option value="COMISSÃO DE DIREITOS HUMANOS">COMISSÃO DE DIREITOS HUMANOS</option>
+                <option value="CHEFE DE COMISSÕES">CHEFE DE COMISSÕES</option>
+            </select>
         </div>
-        <div id="chat-mensagens" class="chat-window p-4 text-sm flex flex-col gap-2"></div>
-        <div class="p-3 border-t border-slate-800 flex gap-2">
-            <input type="text" id="input-msg" placeholder="Sua mensagem..." class="flex-1 bg-black p-2 rounded text-xs outline-none">
-            <button onclick="enviarMensagem()" class="bg-yellow-600 px-3 py-1 text-black font-bold rounded">></button>
+        <div class="form-group"><label>Senha</label><input type="password" id="pass" placeholder="Digite sua senha"></div>
+        <button onclick="handleLogin()">Entrar no Sistema</button>
+    </div>
+
+    <div id="dashboard" class="container hidden">
+        <div style="text-align: right; margin-bottom: 10px;">
+            <span id="user-display" style="font-size: 12px; font-weight: bold;"></span> |
+            <a href="#" onclick="location.reload()" style="color: #dc3545; font-size: 12px;">Sair</a>
+        </div>
+        <h2>Cadastrar Ação - Grêmio Estudantil</h2>
+       
+        <div class="form-group"><label>Nome de quem está realizando a ação</label><input type="text" id="nome_executor" placeholder="Digite seu nome completo"></div>
+
+        <div class="form-group"><label>Título da Ação</label><input type="text" id="titulo"></div>
+       
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;"><label>Data</label><input type="date" id="data"></div>
+            <div class="form-group" style="flex: 1;"><label>Participantes</label><input type="number" id="qtd"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Proposta de Ação</label>
+            <select id="proposta">
+                <option value="Grêmio">Grêmio</option>
+                <option value="Gestão Escolar">Gestão Escolar</option>
+                <option value="GRESP - SEDUC">GRESP - SEDUC</option>
+            </select>
+        </div>
+
+        <div class="form-group"><label>Tema</label><input type="text" id="tema"></div>
+        <div class="form-group"><label>Descrição Completa</label><textarea id="descricao" rows="4"></textarea></div>
+
+        <button class="btn-save" onclick="salvarAcao()">Salvar Registro de Ação</button>
+        <button class="btn-log" onclick="acessarLogs()">Consultar Histórico de Logs</button>
+    </div>
+
+    <div id="logs-screen" class="container hidden" style="max-width: 900px;">
+        <h2>Histórico de Registros</h2>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+            <button onclick="voltarDash()" style="background: #343a40; width: auto; padding: 10px 20px; color: white; border: none; border-radius: 4px; cursor: pointer;">Voltar</button>
+            <button style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;" onclick="limparBanco()">Limpar Histórico</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Cargo/Autor</th>
+                        <th>Ação</th>
+                        <th>Download</th>
+                    </tr>
+                </thead>
+                <tbody id="log-table-body"></tbody>
+            </table>
         </div>
     </div>
 
-    <section id="secao-admin" class="container mx-auto p-6 hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="lg:col-span-1 space-y-2 admin-sidebar pr-4">
-                <button onclick="showAdminTab('produtos')" class="w-full text-left p-3 hover:bg-slate-800 rounded">📦 Produtos</button>
-                <button onclick="showAdminTab('chats')" class="w-full text-left p-3 hover:bg-slate-800 rounded">💬 Atender Clientes</button>
-                <button onclick="showAdminTab('vendedores')" class="w-full text-left p-3 hover:bg-slate-800 rounded">👥 Vendedores</button>
-                <button onclick="showAdminTab('logs')" class="w-full text-left p-3 hover:bg-slate-800 rounded">📜 Logs do Sistema</button>
-                <button onclick="showAdminTab('config')" class="w-full text-left p-3 hover:bg-slate-800 rounded">⚙️ Configurações</button>
-            </div>
-
-            <div class="lg:col-span-3 bg-slate-900 p-6 rounded-xl border border-slate-800">
-                
-                <div id="tab-produtos" class="admin-tab">
-                    <h2 class="text-xl font-bold mb-4">Gerenciar Produtos</h2>
-                    <div class="flex gap-2 mb-6">
-                        <input type="text" id="new-prod-name" placeholder="Nome" class="bg-black p-2 rounded flex-1">
-                        <input type="number" id="new-prod-price" placeholder="Valor" class="bg-black p-2 rounded w-24">
-                        <button onclick="addProdutoBD()" class="bg-green-600 px-4 py-2 rounded font-bold">Add</button>
-                    </div>
-                    <div id="admin-lista-produtos" class="space-y-2"></div>
-                </div>
-
-                <div id="tab-chats" class="admin-tab hidden">
-                    <h2 class="text-xl font-bold mb-4">Chats Ativos</h2>
-                    <div id="admin-lista-chats" class="grid grid-cols-1 gap-2"></div>
-                </div>
-
-                <div id="tab-logs" class="admin-tab hidden">
-                    <h2 class="text-xl font-bold mb-4">Logs Gerais</h2>
-                    <div id="lista-logs" class="text-[10px] font-mono text-gray-400 space-y-1"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // CONFIGURAÇÃO DO FIREBASE (Coloque seus dados aqui)
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJETO_ID",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "ID",
-            appId: "APP_ID"
+    <script>
+        const { jsPDF } = window.jspdf;
+       
+        const users = {
+            "COORDENADOR FINANCEIRO": "16",
+            "COORDENADOR EVENTOS": "16",
+            "COORDENADOR COMUNICAÇÃO": "16",
+            "COORDENADOR DESPORTIVO": "16",
+            "COORDENADOR CULTURAL": "16",
+            "COORDENADOR RELAÇÕES SOCIAIS/CONVIVA": "16",
+            "COMISSÃO DE' DIREITOS HUMANOS": "16",
+            "CHEFE DE COMISSÕES": "16"
         };
+       
+        let loggedUser = "";
+        const DB_NAME = 'gremio_db_v6';
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        function handleLogin() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            if (u === "") return alert("Selecione um cargo.");
+            if (users[u] === p) {
+                loggedUser = u;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('user-display').innerText = "Cargo: " + u;
+            } else { alert("Senha inválida!"); }
+        }
 
-        // CONFIGURAÇÕES GLOBAIS
-        const EMAIL_MASTER = "srleal018@gmail.com";
-        let MEU_PIX = "52385277808";
-        let chatIdAtual = localStorage.getItem('chat_session') || "user_" + Date.now();
-        localStorage.setItem('chat_session', chatIdAtual);
+        function salvarAcao() {
+            const executor = document.getElementById('nome_executor').value;
+            const titulo = document.getElementById('titulo').value;
+            const dataAcao = document.getElementById('data').value;
+            const qtd = document.getElementById('qtd').value;
+            const proposta = document.getElementById('proposta').value;
+            const tema = document.getElementById('tema').value;
+            const descricao = document.getElementById('descricao').value;
 
-        // --- SISTEMA DE LOGS ---
-        async function registrarLog(acao, usuario) {
-            await addDoc(collection(db, "logs"), {
-                timestamp: new Date().toLocaleString(),
-                acao: acao,
-                usuario: usuario
+            if (!executor || !titulo || !dataAcao) return alert("Preencha o Nome, Título e Data!");
+
+            const registro = {
+                id: Date.now(),
+                cargo: loggedUser,
+                autor: executor,
+                dataReg: new Date().toLocaleDateString('pt-BR'),
+                horaReg: new Date().toLocaleTimeString('pt-BR'),
+                titulo, dataAcao, qtd, proposta, tema, descricao
+            };
+
+            let logs = JSON.parse(localStorage.getItem(DB_NAME) || "[]");
+            logs.push(registro);
+            localStorage.setItem(DB_NAME, JSON.stringify(logs));
+
+            alert("Ação salva com sucesso!");
+            document.querySelectorAll('input, textarea').forEach(i => i.value = "");
+        }
+
+        function acessarLogs() {
+            const pass = prompt("Senha de acesso ao Histórico:");
+            if (pass === "2016") {
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('logs-screen').classList.remove('hidden');
+                renderLogs();
+            } else { alert("Acesso Negado!"); }
+        }
+
+        function renderLogs() {
+            const tbody = document.getElementById('log-table-body');
+            const logs = JSON.parse(localStorage.getItem(DB_NAME) || "[]");
+            tbody.innerHTML = "";
+            logs.reverse().forEach(log => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${log.dataReg} ${log.horaReg}</td>
+                    <td><strong>${log.cargo}</strong><br><small>${log.autor}</small></td>
+                    <td>${log.titulo}</td>
+                    <td><button class="badge-download" onclick="gerarPDF(${log.id})">PDF</button></td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
-        // --- GERENCIAMENTO DE PRODUTOS ---
-        window.addProdutoBD = async () => {
-            const nome = document.getElementById('new-prod-name').value;
-            const valor = document.getElementById('new-prod-price').value;
-            await addDoc(collection(db, "produtos"), { nome, valor, ativo: true });
-            registrarLog(`Adicionou produto: ${nome}`, EMAIL_MASTER);
-        };
+        function gerarPDF(id) {
+            const logs = JSON.parse(localStorage.getItem(DB_NAME) || "[]");
+            const d = logs.find(l => l.id === id);
+            if (!d) return;
 
-        function carregarProdutos() {
-            onSnapshot(collection(db, "produtos"), (snap) => {
-                const grid = document.getElementById('grid-produtos');
-                const adminGrid = document.getElementById('admin-lista-produtos');
-                grid.innerHTML = ""; adminGrid.innerHTML = "";
+            const doc = new jsPDF();
+            doc.setFillColor(0, 168, 150);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text("RELATÓRIO DE AÇÃO ESTUDANTIL", 105, 25, { align: "center" });
+           
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text(`Grêmio Estudantil: Geração Consciente`, 20, 55);
+            doc.text(`Responsável: ${d.autor} (${d.cargo})`, 20, 65);
+           
+            doc.setFont("helvetica", "normal");
+            doc.text(`Título da Ação: ${d.titulo}`, 20, 80);
+            doc.text(`Data da Realização: ${d.dataAcao}`, 20, 90);
+            doc.text(`Participantes: ${d.qtd}`, 20, 100);
+            doc.text(`Origem: ${d.proposta}`, 20, 110);
+            doc.text(`Tema: ${d.tema}`, 20, 120);
+           
+            doc.line(20, 125, 190, 125);
+            doc.text("Descrição:", 20, 135);
+            const descLines = doc.splitTextToSize(d.descricao, 170);
+            doc.text(descLines, 20, 145);
 
-                snap.forEach(doc => {
-                    const p = doc.data();
-                    // Card Loja
-                    grid.innerHTML += `
-                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-                            <h3 class="text-xl font-bold">${p.nome}</h3>
-                            <p class="text-yellow-500 font-black text-2xl mb-4 text-mono">R$ ${p.valor}</p>
-                            <button onclick="abrirChat('${p.nome}')" class="w-full bg-yellow-600 text-black py-2 rounded-lg font-bold">NEGOCIAR AGORA</button>
-                        </div>`;
-                });
-            });
+            doc.setFontSize(10);
+            doc.text(`Registrado em: ${d.dataReg} às ${d.horaReg}`, 20, 280);
+            doc.save(`Acao_${d.titulo}.pdf`);
         }
 
-        // --- SISTEMA DE CHAT EM TEMPO REAL ---
-        window.abrirChat = (produto) => {
-            document.getElementById('chat-container').classList.remove('hidden');
-            enviarMensagemSistema(`Olá! Gostaria de comprar: ${produto}. Como faço para pagar via PIX?`);
-        };
-
-        async function enviarMensagemSistema(texto) {
-            await addDoc(collection(db, "chats", chatIdAtual, "mensagens"), {
-                texto: texto,
-                sender: "cliente",
-                time: new Date()
-            });
-            registrarLog("Cliente iniciou negociação", chatIdAtual);
-        }
-
-        window.enviarMensagem = async () => {
-            const msg = document.getElementById('input-msg').value;
-            if(!msg) return;
-            await addDoc(collection(db, "chats", chatIdAtual, "mensagens"), {
-                texto: msg,
-                sender: "cliente",
-                time: new Date()
-            });
-            document.getElementById('input-msg').value = "";
-        };
-
-        function ouvirMensagens() {
-            const q = query(collection(db, "chats", chatIdAtual, "mensagens"), orderBy("time", "asc"));
-            onSnapshot(q, (snap) => {
-                const box = document.getElementById('chat-mensagens');
-                box.innerHTML = "";
-                snap.forEach(doc => {
-                    const m = doc.data();
-                    const align = m.sender === "cliente" ? "text-right" : "text-left";
-                    const color = m.sender === "cliente" ? "bg-yellow-600 text-black" : "bg-slate-800";
-                    box.innerHTML += `<div class="${align}"><span class="${color} p-2 rounded-lg inline-block">${m.texto}</span></div>`;
-                });
-                box.scrollTop = box.scrollHeight;
-            });
-        }
-
-        // --- ÁREA ADMINISTRATIVA ---
-        window.solicitarAcessoAdm = () => {
-            const email = prompt("Email de Acesso:");
-            if(email === EMAIL_MASTER) {
-                document.getElementById('secao-loja').classList.add('hidden');
-                document.getElementById('secao-admin').classList.remove('hidden');
-                registrarLog("Login realizado no painel", email);
-                carregarLogs();
-            } else {
-                alert("Acesso Negado.");
+        function limparBanco() {
+            if (confirm("Apagar todos os registros permanentemente?")) {
+                localStorage.removeItem(DB_NAME);
+                renderLogs();
             }
-        };
-
-        window.showAdminTab = (tab) => {
-            document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-        };
-
-        function carregarLogs() {
-            onSnapshot(query(collection(db, "logs"), orderBy("timestamp", "desc")), (snap) => {
-                const lista = document.getElementById('lista-logs');
-                lista.innerHTML = "";
-                snap.forEach(doc => {
-                    const l = doc.data();
-                    lista.innerHTML += `<div>[${l.timestamp}] - ${l.usuario}: ${l.acao}</div>`;
-                });
-            });
         }
 
-        // INICIALIZAÇÃO
-        carregarProdutos();
-        ouvirMensagens();
-        window.fecharChat = () => document.getElementById('chat-container').classList.add('hidden');
-        window.showSection = (sec) => {
-            document.getElementById('secao-loja').classList.remove('hidden');
-            document.getElementById('secao-admin').classList.add('hidden');
+        function voltarDash() {
+            document.getElementById('logs-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
         }
     </script>
 </body>
