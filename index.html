@@ -7,8 +7,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
-            --sed-primary: #00a896;
-            --sed-secondary: #489cd4; /* Nova Cor Azul Solicitada */
+            /* MUDANÇA AQUI: O verde agora é o Azul solicitado */
+            --sed-primary: #489cd4; 
+            --sed-secondary: #489cd4; 
             --sed-dark: #1d2d35;
             --sed-bg: #f0f4f7;
             --sed-error: #dc3545;
@@ -180,7 +181,6 @@
         let loggedUser = "";
         const DB_NAME = 'gremio_db_v6';
 
-        // --- FUNÇÕES DOS MODAIS ---
         function showAlert(msg) {
             document.getElementById('alert-text').innerText = msg;
             document.getElementById('modal-alert').style.display = 'flex';
@@ -216,7 +216,6 @@
             }
         }
 
-        // --- LÓGICA DO SISTEMA ---
         function handleLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
@@ -275,7 +274,8 @@
             const logs = JSON.parse(localStorage.getItem(DB_NAME) || "[]");
             const d = logs.find(l => l.id === id);
             const doc = new jsPDF();
-            doc.setFillColor(0, 168, 150); doc.rect(0, 0, 210, 40, 'F');
+            // AJUSTE: Mudei os valores RGB de (0, 168, 150) para o azul (72, 156, 212)
+            doc.setFillColor(72, 156, 212); doc.rect(0, 0, 210, 40, 'F');
             doc.setTextColor(255, 255, 255); doc.setFontSize(18);
             doc.text("RELATÓRIO DE AÇÃO - GRÊMIO", 105, 25, { align: "center" });
             doc.setTextColor(0, 0, 0); doc.setFontSize(12); doc.setFont("helvetica", "bold");
